@@ -1,20 +1,20 @@
-\# sa-tm-barrier-bypass
+# sa-tm-barrier-bypass
 
 
 
-\*\*Structurally-Aware Turing Machines: Transcending Complexity Barriers\*\*
+**Structurally-Aware Turing Machines: Transcending Complexity Barriers**
 
 
 
 This repository contains the full LaTeX source, bibliography, and supplementary material
 
-for the preprint demonstrating an oracle separation `P^O\_SA != NP^O\_SA` that bypasses
+for the preprint demonstrating an oracle separation `P^O_SA != NP^O_SA` that bypasses
 
 all four major barriers in complexity theory.
 
 
 
-\## Build Instructions
+## Build Instructions
 
 
 
@@ -30,61 +30,38 @@ pdflatex main.tex
 
 ```
 
-\## Repository Structure
+## Repository Structure
 
 main.tex — main LaTeX source
 
-
-
 refs.bib — bibliography database
-
-
 
 README.md — this file
 
 
-
-\## Bibliography
-
-
+## Bibliography
 
 Includes classical and modern references on:
 
-
-
 * Oracle separations (BGS75)
-
-
 
 * Natural Proofs (RR97)
 
-
-
 * Algebraization (AW09)
-
-
 
 * Proof Complexity (Frege, Krajíček95)
 
+* Sum-Check & PCP (Arora–Barak 2009)
 
-
-* Sum-Check \& PCP (Arora–Barak 2009)
-
-
-
-* LWE \& Post-Quantum Cryptography
-
-
+* LWE & Post-Quantum Cryptography
 
 * Dilithium digital signatures
 
 
 
-\## License \& Citation
+## License & Citation
 
 Please cite as:
-
-
 
 > R. Huseynzade, “Structurally-Aware Turing Machines: Transcending Complexity Barriers,” 2025.
 
