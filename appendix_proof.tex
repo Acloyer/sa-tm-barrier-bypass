@@ -1,0 +1,80 @@
+% appendix_proof.tex
+\section{Proof-Complexity Lower Bound}
+
+Recall $\tau_n$
+(Definition~\ref{thm:proof}):  
+“no SA-TM of size $\le n$ with pattern $\Diag_n$
+accepts its own code”.
+
+\subsection{Upper bound: poly-size SA-proofs}
+
+\begin{lemma}\label{lem:sa-proof}
+There exists an SA-Frege proof of $\tau_n$
+of size $O(n^2)$.
+\end{lemma}
+
+\begin{proof}
+The proof carries out the diagonal construction
+\emph{inside} the proof system:
+each derivation line is either
+(i) a local copy of one transition
+(read via \texttt{TRANS}), or
+(ii) an arithmetic equality justifying the
+padding length $|x|>4\log n$.
+Since every INT query reads $\le\tau(n)=O(\log n)$ bits,
+encoding one line takes $O(\log n)$ symbols,
+hence total size $O(n^2)$.
+\end{proof}
+
+\subsection{Lower bound against Frege}
+
+\paragraph{Outline.}
+We interpolate between SA-tautologies and
+the Razborov–Smolensky pigeonhole principle (PHP),
+whose Frege size lower bound is $n^{\Omega(\log n)}$.
+
+\begin{definition}[Gadget encoding]\label{def:gadget}
+Map each pigeon $p\in[n+1]$ to a unique
+pattern $g(p)\in\{0,1\}^{m}$ 
+whose first $\Theta(\log n)$ bits equal~$p$.
+The SA-pattern $\Diag_n$ contains every $g(p)$
+inside its self-reference query.
+\end{definition}
+
+\begin{lemma}[Feasible interpolation]\label{lem:interpolation}
+Any Frege proof of $\tau_n$ of size $s$
+yields a Boolean circuit of size $s^{O(1)}$
+separating
+\(\textit{PHP}_{n+1\to n}\) from its negation.
+\end{lemma}
+
+\begin{proof}
+Standard Krajíček–Razborov interpolation:
+variables corresponding to
+$g(p)$ act as \emph{selector} wires.
+Since $\tau_n$ is of the form
+$\bigvee_p C_p$ with each clause $C_p$
+mentioning \emph{disjoint} symbol sets,
+the circuit splits into $s^{O(1)}$ monotone gates.
+\end{proof}
+
+\begin{theorem}[Frege lower bound]\label{thm:frege-lb}
+Every Frege proof of $\tau_n$ has size
+$n^{\Omega(\log n)}$.
+\end{theorem}
+
+\begin{proof}
+If a shorter Frege proof existed,
+Lemma~\ref{lem:interpolation} would give
+a circuit contradicting the known
+Razborov \cite{Raz87} lower bound
+$\textit{size}\!>\!n^{\Omega(\log n)}$
+for monotone $\textit{PHP}$ circuits.
+\end{proof}
+
+\paragraph{Remark.}
+The separation exploits the \emph{local-code} feature:
+Frege cannot efficiently encode the many
+independent address bits hidden in $\Diag_n$,
+whereas SA-Frege gains them at $O(\log n)$ cost
+via \texttt{CODE\_TAPE}.

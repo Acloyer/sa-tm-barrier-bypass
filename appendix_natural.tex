@@ -1,0 +1,71 @@
+% appendix_natural.tex
+\section{LWE-Based Pseudo-Natural Property}\label{sec:lwe-app}
+
+Throughout the appendix fix a prime $p=2^{\Theta(n)}$
+and parameters $(d,q)$ of the standard decisional
+$\LWE_{n,d,q}$ distribution with $q=p$.
+The PRG from Assumption~\ref{sec:lwe-ass} is
+\[
+   G:\{0,1\}^d \;\longrightarrow\; \{0,1\}^{2^n},
+   \qquad s\;\mapsto\; (\,\langle\mathbf a_i,s\rangle + e_i\bmod p\,)_{i<2^n},
+\]
+where $(\mathbf a_i)\!\leftarrow\!\F_p^{d}$ are public
+and $e_i\!\leftarrow\!\text{err}$.
+
+\subsection{Definition of $Q_n$}
+
+Partition the Boolean cube
+$\{0,1\}^{2^n}$ into \emph{windows}
+$W_{u}:=\{v\mid v_{|u|}=u\}$ of size $2^{2^n-|u|}$,
+indexed by binary strings $u$ of length $|u|\le \tau(n)=\Theta(\log n)$.
+Let
+\[
+  Q_n \;=\;
+  \Bigl\{\,z\in\{0,1\}^{2^n} \ \Big|\  
+     \exists u:|u|=\tau(n) \text{ with } 
+     z|_{W_u} = G(s)\big|_{W_u}\text{ for some }s\!\in\!\{0,1\}^d
+  \Bigr\}.
+\]
+
+\paragraph{Computability (C$^*$).}
+An SA-TM checks all $2^{\tau(n)}\!=\!n^{O(1)}$ windows~$W_u$
+by issuing \texttt{INPUT($i$)} queries for those addresses,
+verifying the linear LWE equations mod~$p$,
+and guessing the seed~$s$.  Total time: $\poly(n)$.
+
+\paragraph{Largeness (L$^*$).}
+Fix any adversary that non-adaptively peeks at 
+$k=\Theta(\log n)$ bits of a random truth-table $Z$.
+Conditional probability that $Z\!\in\!Q_n$ remains
+$2^{-O(n)}$: indeed, for $Z\!\leftarrow\!\{0,1\}^{2^n}$
+the chance that \emph{some} window coincides 
+with \emph{any} PRG output is
+$\dfrac{2^{\tau(n)}\cdot 2^{d}}{2^{|W_u|}}=2^{-\Omega(n)}$.
+
+\begin{lemma}[Reduction hybrid]\label{lem:lwe-hybrid}
+Suppose there exists a PPT SA-tester
+$D$ distinguishing $G$ from uniform with
+advantage $\varepsilon(n)\!>\!1/\poly(n)$
+while seeing at most $k$ bits of the table.
+Then one can build an $\LWE$ distinguisher
+breaking Assumption~\ref{sec:lwe-ass}.
+\end{lemma}
+
+\begin{proof}
+Standard hybrid $H_0,\dots,H_k$:
+replace answers to the \emph{queried} addresses
+one by one by truly random.
+Every transition changes advantage $\le \varepsilon/k$;
+otherwise we could recover a corrupted sample
+and solve $\LWE$ via the leftover-hash lemma.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:lwe}]
+$Q_n$ satisfies (C$^*$) and (L$^*$) by construction.
+Assume for contradiction there is an SA-natural 
+lower-bound proof that $L^\OO\notin\classP_{\SA}^\OO$
+recognised by~$Q_n$.
+Composing that proof with $D$ of Lemma~\ref{lem:lwe-hybrid}
+yields an $\LWE$ breaker of non-negligible advantage,
+contradiction.
+\end{proof}

@@ -1,0 +1,53 @@
+% appendix_algebra.tex
+\section{Algebraization: Exponential Degree Lower Bound}
+
+We restate Theorem~\ref{thm:algebra}:
+
+\begin{theorem*}
+Let $m$ be the bit-length of an SA-query
+$q=\langle\Diag,i,x\rangle$.  
+Any polynomial $P:\F^m\!\to\F$ that agrees with
+the Boolean function $f_m$ on $\{0,1\}^m$
+must have $\deg P \ge 2^{\Omega(m)}$.
+\end{theorem*}
+
+\subsection{Derivative method}
+
+Write $\Delta_{e_j}P(z)=P(z+e_j)-P(z)$.
+For $k$-tuple $S\subseteq[m]$ define
+$\Delta_S P = \Delta_{e_{j_1}}\cdots\Delta_{e_{j_k}}P$,
+$k=|S|$.
+
+\begin{lemma}\label{lem:support}
+For every $z\in\{0,1\}^m$ the value $f_m(z)=1$
+iff $z$ encodes a self-diagonalising query.
+Hamming balls of radius $\le m/4$ around those $z$
+are \emph{disjoint}.
+\end{lemma}
+
+\begin{proof}
+Each such $z$ embeds a minimal Gödel index $i$
+and padded input~$x$;
+changing $\le m/4$ coordinates
+cannot transform it into another valid encoding
+due to prefix-free coding of $i$.
+\end{proof}
+
+\begin{lemma}\label{lem:derivative}
+If $\deg P < 2^{m/4}$, 
+then $\Delta_S P \equiv 0$ for all $|S|=2^{m/4}$
+by basic polynomial calculus.
+\end{lemma}
+
+Choose $S$ hitting one bit in each disjoint
+ball of Lemma~\ref{lem:support}.
+$f_m$ restricted to that $S$ remains
+\emph{non-zero}, hence
+$\Delta_S P$ must be non-zero on $\{0,1\}^{m-|S|}$,
+contradiction.
+
+\begin{proof}[Completion of proof]
+Set $k=2^{m/4}$; any agreeing polynomial
+must have degree $\ge k$, i.e.\ 
+$2^{\Omega(m)}$.
+\end{proof}

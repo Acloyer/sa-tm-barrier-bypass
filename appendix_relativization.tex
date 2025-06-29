@@ -1,0 +1,46 @@
+% appendix_relativization.tex
+\section{Relativization Barrier Details}
+
+Classical relativizing lower-bound techniques
+(Baker–Gill–Solovay, circuit simulations à la Bennett, 
+and the linear-speed-up argument) assume that
+\emph{any} black-box call to oracle~$\OO$ can be reproduced by
+a universal machine that merely intercepts the query string.
+SA-TMs break this assumption, because a query may depend on
+\emph{bits of the machine description that are
+outside the radius $\tau(n)=\Theta(\log n)$ of any external simulator}. 
+Below we formalise this obstruction.
+
+\begin{theorem}\label{thm:nonrel}
+Let $U$ be any deterministic oracle TM that simulates
+every SA-TM $M$ for at most $p(|x|)$ overhead
+and issues each oracle question \emph{verbatim}.
+Then $p(n)$ must be super-polynomial.
+\end{theorem}
+
+\begin{proof}
+Fix $n$ and consider the following SA-TM $M_n$ on empty input~$\epsilon$.
+\begin{enumerate}
+  \item Read its own code tape within radius $\tau(n)$,
+        thereby learning the first $\Theta(\log n)$ bits of its Gödel index~$i_n$.
+  \item Construct string $x_n$ of length $n$ 
+        that explicitly records those bits and pads by~$0$’s.
+  \item Query the oracle at $q=\langle\Diag,i_n,x_n\rangle$ and output the reply.
+\end{enumerate}
+By Lemma~\ref{lem:nocirc}, $|q|>\tau(n)$,
+so \emph{none} of the bits inspected on the code tape suffices
+to reconstruct the full $q$.
+Any ordinary TM~$U$ that wishes to simulate step 3
+must explicitly \emph{output} $q$ on its own oracle channel.
+Hence $U$ must embed all $\Theta(n)$ undocumented bits of $i_n$
+into its work tape, violating the assumed polynomial overhead.
+Formally, otherwise we would compress $i_n$ to $O(\log n)$ bits,
+contradicting the Kolmogorov-incompressibility of a random index.
+\end{proof}
+
+\begin{corollary}
+The separation $\classP_{\SA}^\OO\!\neq\!\classNP_{\SA}^\OO$
+of Section~\ref{sec:oracle} is \emph{non-relativizing}:
+there is no black-box proof that resolves $P$ vs $NP$
+in the SA-model uniformly for \emph{all} oracles.
+\end{corollary}
