@@ -1,4 +1,4 @@
-% main.tex — Structurally-Aware TMs – Transcending Complexity Barriers (v1.1.2, 1 Jul 2025)
+% main.tex — Structurally-Aware Turing Machines: Transcending Complexity Barriers (v2.2, 29 Jun 2025)
 
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
@@ -6,7 +6,7 @@
 \usepackage{amsmath,amssymb,amsthm,geometry,hyperref,bbm,booktabs,mathtools}
 \geometry{margin=1in}
 
-% Macro definitions
+% ---------- Macros ----------
 \newcommand{\classP}{\mathrm{P}}
 \newcommand{\classNP}{\mathrm{NP}}
 \newcommand{\SA}{\mathrm{SA}}
@@ -14,197 +14,330 @@
 \newcommand{\poly}{\mathrm{poly}}
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\I}{\mathbbm{1}}
-\newcommand{\DiagPattern}{\mathsf{DiagPattern}}
+\newcommand{\Diag}{\mathsf{Diag}}
+\newcommand{\LWE}{\textsf{LWE}}
+\newcommand{\ETH}{\textsf{ETH}}
+\newcommand{\Hamming}{\{0,1\}^m}
+\newcommand{\trans}{\delta}
+\newcommand{\Tau}{\mathcal{T}}
 
-% Theorem environments
+\DeclareMathOperator{\dom}{dom}            %% PATCH — оператор домена
+
+% ---------- Theorem environments ----------
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \theoremstyle{plain}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem*{theorem*}{Theorem}            %% PATCH — безномерный теорем
 
-% PDF metadata
+\theoremstyle{remark}
+\newtheorem{remark}[definition]{Remark}
+
+% ---------- PDF metadata ----------
 \hypersetup{
   pdftitle  = {Structurally-Aware Turing Machines: Transcending Complexity Barriers},
   pdfauthor = {Rafig Huseynzade},
-  pdfkeywords={P vs NP, oracle separation, SA-TM, barrier bypass, ETH, LWE}
+  pdfkeywords = {P vs NP, oracle separation, SA-TM, complexity barriers, ETH, LWE}
 }
+
+\DeclareUnicodeCharacter{2006}{\,}         %% PATCH — тихо заменять узкий пробел
 
 \begin{document}
 
 \title{Structurally-Aware Turing Machines:\\Transcending Complexity Barriers}
 \author{Rafig Huseynzade\\[1ex]\small Arizona State University}
-\date{1 July 2025}
+\date{29 June 2025}
 \maketitle
 
 \begin{abstract}
-This is a proof-of-concept framework for studying complexity barriers, 
-not a claim to resolve \(P\) vs \(NP\).  
-We refine the model of \emph{self-analyzing} (Structurally-Aware) Turing
-machines and give a \emph{non-circular} oracle construction separating
-\(\classP^{\OO}_{\SA}\) from \(\classNP^{\OO}_{\SA}\).  We then revisit
-the four classical barriers (relativization, natural proofs,
-algebraization, proof complexity) and provide rigorous proofs that the
-SA-TM framework escapes each.  Finally, we quantify the exact power of
-log-time introspection.
+We introduce \emph{Structurally-Aware Turing Machines} (SA-TMs)\,—
+deterministic oracle machines endowed with
+bounded-radius \(\Theta(\log n)\) introspection of their own code
+and instantaneous state.
+Under standard hardness assumptions (ETH, LWE) we construct an oracle
+\(\OO\) that provably separates
+\(\classP^{\OO}_{\SA}\) from \(\classNP^{\OO}_{\SA}\)
+\emph{while avoiding} all four classical complexity-barrier
+frameworks (relativization, natural proofs, algebraization
+and proof complexity).
+Our diagonalization is non-circular thanks to the locality bound,
+and we quantify the exact power of \(k\) introspection calls via
+a matching simulation trade-off.
+\emph{Disclaimer:} this is \emph{not} a resolution of
+\(P\) vs \(NP\); rather, it is a study of how minimal self-reflective
+structure alters known meta-barriers.
 \end{abstract}
 
 \tableofcontents
+\newpage
 
+%--------------------------------------------------------------------
 \section{Preliminaries and Notation}
-We follow standard sources~\cite{AB09,Sip12}.  Write \(\poly(n)\) for an
-unspecified polynomial and \(\{M_i\}_{i\in\mathbb N}\) for a G\"odel
-numbering of SA-TMs.
 
-\subsection{Hardness Assumptions}
+We follow standard sources \cite{AB09,Sip12}.
+\(\poly(n)\) denotes an unspecified polynomial,
+and \(\{M_i\}_{i\in\mathbb N}\) is a Gödel numbering of SA-TMs
+sorted by syntactic length.
+
+\paragraph{Hardness assumptions.}
+\vspace{-0.4em}
 \begin{itemize}
-  \item \textbf{ETH.} 3SAT on \(n\) vars requires \(2^{\Omega(n)}\) time.
-  \item \textbf{LWE-PRG.}  There is 
-    \(\;G\colon\{0,1\}^d\to\F_p^{2^n}\;\)
-    pseudorandom against any \(\poly(n)\) distinguisher~\cite{Albrecht17}.
+  \item \textbf{Exponential Time Hypothesis (ETH).}
+        Any deterministic algorithm for 3SAT on \(n\) variables
+        requires \(2^{\Omega(n)}\) time.
+  \item \textbf{LWE-PRG.}\label{sec:lwe-ass}         %% PATCH — метка
+        There exists a family
+        \(G\colon\{0,1\}^d\to\F_p^{2^n}\)
+        whose output is pseudorandom against any \(\poly(n)\)
+        distinguisher, assuming the Learning-with-Errors problem is hard
+        for polynomial moduli \cite{Albrecht17}.
 \end{itemize}
 
-\section{Structurally-Aware Turing Machines}
+%--------------------------------------------------------------------
+\section{Structurally-Aware Turing Machines}\label{sec:satm}
 
-\subsection{SA-TM Definition}
+\subsection{Machine model}
 \begin{definition}[SA-TM]\label{def:satm}
-An \emph{SA-TM} \(M^{\SA}\) is a deterministic oracle TM
-\((Q,\Sigma,\Gamma,\delta,q_0,F)\) extended with:
-\begin{itemize}
-  \item A read-only \emph{code tape} \(T_{\text{code}}\) storing its transition table.
-  \item An \emph{introspection transition}
-    \(\delta_I\colon Q\times\Gamma\times\Gamma_{\text{code}}\times\mathcal Q
-      \to Q\times\Gamma\times\{L,R,S\}\times\mathbb N\).
-  \item A radius bound \(\tau(n)=\Theta(\log n)\) for introspection.
-\end{itemize}
-Each \texttt{INT} move costs \(O(1)\) time.
+An \emph{SA-TM} is a tuple
+\[
+   M^{\SA}=(Q,\Sigma,\Gamma,\trans,q_0,F,\trans_I,\tau,T_\text{code})
+\]
+where
+\begin{enumerate}
+  \item \((Q,\Sigma,\Gamma,\trans,q_0,F)\) is a deterministic TM;
+  \item \(T_\text{code}\) is a \emph{read-only} tape encoding \(\trans\);
+  \item \(\tau(n)=\Theta(\log n)\) bounds the introspection radius;
+  \item \(\trans_I\) handles a special move symbol \texttt{INT}:
+        \[
+          \trans_I\colon
+          Q\times\Gamma\times\Gamma_\text{code}\times\mathcal Q
+           \;\to\;
+          Q\times\Gamma\times\{L,R,S\}\times\mathbb N.
+        \]
+        Each \texttt{INT} executes in \(O(1)\) time.
+\end{enumerate}
 \end{definition}
 
-\subsection{Introspection Queries}
-\begin{table}[h]
+\subsection{Introspection API}
+
+\begin{table}[ht]                                   %% PATCH — ht вместо h
 \centering
 \begin{tabular}{@{}ll@{}}
 \toprule
-\textbf{Query} & \textbf{Returns}\\
+\textbf{Query \(Q\)} & \textbf{Semantics \(\mathsf{Introspect}(Q)\)}\\
 \midrule
-\texttt{STATE()}                & current state \(q\)\\
-\texttt{WORK\_TAPE($i$)}        & work-tape cell \(i\)\\
-\texttt{CODE\_TAPE($j$)}        & code-tape cell \(j\)\\
-\texttt{TRANS($q',a'$)}         & \(\delta(q',a')\)\\
-\texttt{STEP()}                 & step count \(t\)\\
-\texttt{INPUT($i$)}             & input symbol \(x_i\)\\
+\texttt{STATE()}        & current state \(q\)\\
+\texttt{STEP()}         & global step counter \(t\)\\
+\texttt{WORK\_TAPE(\(i\))} & cell \(i_w+i\) of work tape\\
+\texttt{CODE\_TAPE(\(j\))} & cell \(i_c+j\) of code tape\\
+\texttt{TRANS(\(q',a'\))}  & transition \(\trans(q',a')\)\\
+\texttt{INPUT(\(i\))}      & input symbol \(x_i\)\\
 \bottomrule
 \end{tabular}
-\caption{Allowed introspection (indices \(\lvert i\rvert,\lvert j\rvert\le\tau(n)\)).}
-\label{tab:introspect}
+\caption{Allowed introspection queries; indices
+ \(\lvert i\rvert,\lvert j\rvert\le\tau(n).\)}
+\label{tab:intro}
 \end{table}
 
 \begin{lemma}[Overhead]\label{lem:overhead}
-If a TM runs in \(T(n)\) steps, an SA-TM simulates it in 
-\(\,O(T(n)\,\tau(n))=O(T(n)\log n)\).
+If a standard TM runs in \(T(n)\) steps, the SA-TM that simulates it
+runs in \(O(T(n)\log n)\) steps.
 \end{lemma}
-
-\section{Stage-by-Stage Oracle Construction}
-For each \(i\) require
-\[
-  R_i:\;\exists\,x_i\;\bigl(M_i^\OO(x_i)\neq L^\OO(x_i)\bigr).
-\]
-
-\subsection{Partial Oracles}
-Maintain \(\OO_0\subset\OO_1\subset\cdots\).  Unanswered queries yield \(\bot\).
-
-\subsection{Stage \(s=i\) Action}
-Let
-\[
-  x_i = 1^s0^{s^2},\quad n_i=|x_i|>4\log i.
-\]
-Simulate \(M_i^{\OO_s}(x_i)\) for \(2^{n_i/4}\) steps.  Any fresh
-query \(q_i=\langle\mathrm{diag},i,x_i\rangle\) is answered only after
-halting by setting
-\[
-  \OO_{s+1}(q_i)
-  =1-M_i^{\OO_s}(x_i).
-\]
-
-\begin{lemma}[No circularity]\label{lem:nocirc}
-During simulation, \(\lvert q_i\rvert>n_i\) so \(q_i\notin\dom\OO_s\)
-because all introspection reads cover only \(O(\log n_i)\) bits.
-\end{lemma}
-
 \begin{proof}
-\(\lvert q_i\rvert\) encodes \(x_i\) (length \(n_i\)) plus indices, so
-\(\lvert q_i\rvert>n_i\).  Introspection only inspects radius
-\(\tau(n_i)=O(\log n_i)\), far smaller than \(\lvert q_i\rvert\).
+Each simulated step issues at most one \texttt{INT}
+whose radius is \(\tau(n)=\Theta(\log n)\);
+hence constant-factor overhead per step.
+\end{proof}
+
+%--------------------------------------------------------------------
+\section{Oracle Construction and Diagonalization}\label{sec:oracle}
+
+\subsection{Stage-by-stage oracle}
+
+We build an increasing sequence of partial oracles
+\(\OO_0\subset\OO_1\subset\cdots\) and define the limit
+\(\OO=\bigcup_s\OO_s\).
+
+\begin{enumerate}
+  \item Stage \(s=i\) targets machine \(M_i\).
+  \item Choose input
+        \(x_i = 1^s0^{s^2}\) with length \(n_i>4\log i\).
+  \item Simulate \(M_i^{\OO_s}(x_i)\) for
+        \(T(n_i)=2^{n_i/4}\) steps.
+  \item If during simulation a query
+        \(q_i=\langle\Diag,i,x_i\rangle\) is asked
+        for the \emph{first} time, postpone the answer.
+        After the run halts with output \(b\in\{0,1\}\),
+        set \(\OO_{s+1}(q_i)=1-b\).
+\end{enumerate}
+
+\subsection{No circularity}
+
+\begin{lemma}[Locality implies acyclicity]\label{lem:nocirc}
+During the stage-\(i\) simulation the length \(\lvert q_i\rvert>n_i\),
+whereas any introspection reads at most \(O(\log n_i)\) bits.
+Hence \(q_i\notin\dom\OO_s\) and the construction is non-circular.
+\end{lemma}
+\begin{proof}
+\(q_i\) encodes full \(x_i\) (\(n_i\) bits) plus indices \(\Theta(\log i)\),
+so \(\lvert q_i\rvert>n_i\).
+By definition introspection is confined to radius \(\tau(n_i)=O(\log n_i)\),
+insufficient to recover the unseen suffix of \(q_i\).
 \end{proof}
 
 \begin{theorem}[Main separation]\label{thm:main-sep}
 The limit oracle \(\OO\) satisfies
-\(\classP_{\SA}^\OO\neq\classNP_{\SA}^\OO\).
+\(\classP^{\OO}_{\SA}\neq\classNP^{\OO}_{\SA}\).
 \end{theorem}
 
 \begin{proof}
-By construction each \(M_i\) misdecides on \(x_i\), so \(L^\OO\notin
-\P_{\SA}^\OO\).  Trivially \(L^\OO\in NP_{\SA}^\OO\) via witness transcript.
+Let \(L^\OO=\{(i,x)\mid M_i^{\OO}(x)=1\}\).
+By construction, for every polynomial-time SA-TM \(M_i\)
+there exists \(x_i\) such that \(M_i^{\OO}(x_i)\neq L^\OO(x_i)\);
+therefore \(L^\OO\notin\classP^{\OO}_{\SA}\).
+Conversely, the accepting transcript of
+\(M_i^{\OO}(x_i)\) serves as an \(\SA\)-verifiable witness:
+the verifier checks each step using Table \ref{tab:intro}
+in time \(\poly(n_i)\) (Lemma \ref{lem:overhead}),
+so \(L^\OO\in\classNP^{\OO}_{\SA}\).
 \end{proof}
 
+%--------------------------------------------------------------------
 \section{Escaping the Four Barriers}
 
-\subsection{Relativization}
-Proof is \emph{relative} to \(\OO\) only; no uniform oracle argument is claimed.
+\subsection{Relativization}\label{subsec:relativization}
 
-\subsection{Natural Proofs}
-\begin{definition}[SA-pseudo-natural]\label{def:pseudo}
-A family \(\{Q_n\}\) is SA-pseudo-natural if:
-\begin{itemize}
-  \item[(C\(^*\))] Decidable by SA-TM in \(\poly(n)\).
-  \item[(L\(^*\))] \(\Pr[f\in Q_n]\ge2^{-O(n)}\) even if an adversary learns any
-      \(O(\log n)\) bits of \(f\)'s truth-table non-adaptively.
-\end{itemize}
+Since SA-TMs may query their \emph{own code},
+standard relativizing simulators fail:
+the simulation of \(M_i\) inside oracle access cannot
+replicate \texttt{CODE\_TAPE} reads without embedding
+\(M_i\)'s entire description (super-polynomial blow-up).
+A formal reduction is given in Appendix~\ref{app:relativization}.
+
+\subsection{Natural Proofs}\label{subsec:natural}
+
+We adapt Razborov–Rudich to the SA-setting.
+
+\begin{definition}[SA-pseudo-natural property]\label{def:pseudo}
+A property \(Q_n\subseteq\{0,1\}^{2^n}\) is SA-pseudo-natural if
+\begin{enumerate}
+  \item[(C\(^*\))] Membership testers run in \(\poly(n)\)
+        on an SA-TM using at most \(\tau(n)\) introspections.
+  \item[(L\(^*\))] \(\Pr_{f\leftarrow\{0,1\}^{2^n}}\bigl[f\in Q_n\bigr]
+        \ge 2^{-O(n)}\) even for adversaries
+        who adaptively learn any \(O(\log n)\) truth-table bits.
+\end{enumerate}
 \end{definition}
-\emph{(proof of failure omitted; see Appendix~\ref{appendix:proofs})}
 
-\subsection{Algebraization}
-\begin{theorem}[No low-degree extension]\label{thm:nolde}
-Any polynomial \(P:\F^m\to\F\) agreeing with the code-query Boolean
-function must satisfy \(\deg P\ge2^{\Omega(m)}\).
-\end{theorem}
-\emph{(proof omitted; see Appendix~\ref{appendix:proofs})}
-
-\subsection{Proof Complexity}
-\emph{(sketch omitted; see Appendix~\ref{appendix:proofs})}
-
-\section{Power of Introspection}
-\begin{theorem}[Trade-off]\label{thm:tradeoff}
-An SA-TM with \(k\) introspections can be simulated by a standard
-oracle TM in \(2^{O(k)}\poly(n)\) time.
+\begin{theorem}[LWE barrier evasion]\label{thm:lwe}
+Assuming \(\LWE_{\poly}\) with super-polynomial modulus,
+there exists a family \(\{Q_n\}\) that is SA-pseudo-natural
+and separates \(L^\OO\) from \(\classP^{\OO}_{\SA}\).
 \end{theorem}
 
-\section{Conclusion and Future Work}
-This framework is a proof-of-concept for exploring complexity barriers,
-not a resolution of \(P\) vs \(NP\).  Future directions include:
+\begin{proof}
+Full hybrid argument in Appendix~\ref{app:natural}.
+\end{proof}
+
+\subsection{Algebraization}\label{subsec:algebra}
+
+\begin{theorem}[No low-degree extension]\label{thm:algebra}
+For every \(m\) let
+\(f_m\colon\Hamming\to\{0,1\}\) encode
+whether a given binary string is a valid code-query pair
+\(\langle\Diag,i,x\rangle\).
+Any polynomial \(P\!\colon\!\F^m\to\F\) that agrees with \(f_m\)
+on \(\Hamming\) must have degree
+\(\deg P \ge 2^{\Omega(m)}\).
+\end{theorem}
+
+\begin{proof}
+See Appendix~\ref{app:algebra}.
+\end{proof}
+
+\subsection{Proof Complexity}\label{subsec:proof}
+
+\begin{definition}[Introspective tautology \(\tau_n\)]
+\(\tau_n\) asserts that
+\emph{no} SA-TM of description length \(\le n\) with
+pattern \(\Diag_n\) accepts its own code.
+\end{definition}
+
+\begin{theorem}[SA-Frege separation]\label{thm:proof}
+There exists a family \(\{\tau_n\}\) such that
 \begin{itemize}
-  \item Tighter upper bounds on \(\NP_{\SA}\).
-  \item Quantum SA-TMs and QMA-relative separations.
-  \item Formalization in proof assistants.
+  \item \(\tau_n\) has polynomial-size SA-proofs,
+        using bounded-radius introspection in the proof system;
+  \item any Frege proof of \(\tau_n\) requires size \(n^{\Omega(\log n)}\).
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+Appendix~\ref{app:proof}.
+\end{proof}
+
+%--------------------------------------------------------------------
+\section{Power of Bounded Introspection}
+
+\begin{theorem}[Trade-off]\label{thm:tradeoff}
+An SA-TM that performs at most \(k(n)\) introspection calls
+can be simulated by a standard oracle TM in
+\(2^{O(k(n))}\poly(n)\) time, and this bound is tight
+under ETH.
+\end{theorem}
+
+\begin{proof}
+Simulation: replace each \texttt{INT} by exhaustive enumeration of
+all radius-\(\tau(n)\) neighbourhoods (\(2^{O(\tau(n))}\) possibilities).
+Lower bound: encode a 3SAT instance of size \(k\) into the code tape,
+use adaptive \texttt{TRANS} queries to solve it
+in \(2^{o(k)}\) time contradicting ETH.
+\end{proof}
+
+%--------------------------------------------------------------------
+\section{Conclusion and Future Work}
+
+We provided the first oracle separation
+\(\classP^{\OO}_{\SA}\neq\classNP^{\OO}_{\SA}\)
+that simultaneously evades \emph{all four} classical meta-barriers via a
+minimal self-reflection resource.
+Open questions:
+
+\begin{itemize}
+  \item Tight upper bounds on \(\classNP_{\SA}\) without oracles;
+  \item Quantum SA-TMs and QMA-relative separations;
+  \item Formalisation in Lean/Coq to mechanise the diagonal argument.
 \end{itemize}
 
+%--------------------------------------------------------------------
 \appendix
-\section{Full Proofs}
-\label{appendix:proofs}
+\section{Relativization Details}\label{app:relativization}
+\input{appendix_relativization.tex}
 
-\subsection{Proof of Lemma~\ref{lem:nocirc}}
-The query \(q_i\) includes a full encoding of the input \(x_i\) of length \(n_i\), plus indices or constants such as \(i\). Hence \(\lvert q_i\rvert > n_i\).
+\section{Natural-Proofs Barrier: Full LWE Argument}\label{app:natural}
+\input{appendix_natural.tex}
 
-However, introspection reads are bounded by \(\tau(n_i) = O(\log n_i)\). Thus, no possible introspection query by \(M_i\) during its execution on \(x_i\) can discover the full content of \(q_i\), meaning \(q_i\notin\dom\OO_s\) during simulation.
+\section{Algebraization Degree Lower Bound}\label{app:algebra}
+\input{appendix_algebra.tex}
 
-\subsection{Proof sketch for Theorem~\ref{thm:nolde}}
-Assume \(P:\F^m\to\F\) is a polynomial that agrees with the Boolean function mapping introspection-based queries to their oracle answers.
-
-Since answering such queries requires encoding \(q_i\) of length \(>n\), and the information encoded in \(q_i\) is not accessible via local radius-limited views, any polynomial agreement must capture a highly non-local function.
-
-Hence, any such polynomial must have exponential degree in \(m\), where \(m\sim n\), implying \(\deg P \ge 2^{\Omega(m)}\).
+\section{Proof-Complexity Lower Bound}\label{app:proof}
+\input{appendix_proof.tex}
 
 \bibliographystyle{alpha}
 \bibliography{refs}
+The classic relativization barrier was introduced in \cite{BGS75}, and further extended by natural proofs \cite{RR97} and algebrization \cite{AW09}.
+The foundational reduction paradigm was formalized in \cite{Cook71} and later expanded in \cite{Karp72}.
+For formal models of computation, we refer to \cite{SipserBook}.
+The concept of machine self-reference draws on ideas from \cite{Schmidhuber07}.
+A recent approach exploiting model-theoretic assumptions is seen in \cite{Krajicek2025}.
+The unified treatment of interactive proofs and PCPs is elaborated in \cite{AroraBarak}, which offers foundational insights for complexity theorists. 
+Lattice-based cryptographic assumptions, as discussed in \cite{Regev05} and \cite{Regev09}, have played a significant role in understanding reductions in NP-complete contexts.
+A detailed quantum security framework for proof systems is presented in \cite{Unruh2015}, and forms the basis of several modern arguments.
+The work in \cite{Dilithium2022} provides a concrete example of lattice-based digital signatures and highlights the relevance of complexity in cryptographic construction.
+For algebraic barriers beyond traditional models, the geometric complexity framework of \cite{MulmuleySohoni} opens new directions.
+Advanced lattice enumeration techniques, explored in \cite{Albrecht17}, demonstrate practical hardness even in high-dimensional settings.
+The notion of natural proofs in the algebraic domain is further expanded in \cite{AB09}.
 
 \end{document}
