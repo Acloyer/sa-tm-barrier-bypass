@@ -1,66 +1,43 @@
+LICENSE - Structurally-Aware Turing Machines (SA-TM)
+Copyright © 2025 Rafig Huseynzade. All Rights Reserved.
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
+This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+You are free to:
 
-# LICENSE - Structurally-Aware Turing Machines (SA-TM)
+Share — copy and redistribute the material in any medium or format
+The licensor cannot revoke these freedoms as long as you follow the license terms.
 
-**Copyright © 2025 Rafig Huseynzade. All Rights Reserved.**  
-**Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License**  
-This work is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+Under the following terms:
 
----
+Attribution — You must give appropriate credit to Rafig Huseynzade, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+NonCommercial — You may not use the material for commercial purposes.
+NoDerivatives — If you remix, transform, or build upon the material, you may not distribute the modified material.
 
-## You are free to:
+Academic Use Exception:
+Academic researchers may cite, reference, and build upon this work for non-commercial research purposes, provided:
 
-- **Share** — copy and redistribute the material in any medium or format  
-- The licensor cannot revoke these freedoms as long as you follow the license terms.
+Full attribution is given to Rafig Huseynzade as the original author
+The original SA-TM framework is properly credited
+Any derivative work clearly states it builds upon SA-TM
+No commercial use without explicit written permission
 
----
+Prohibited Actions:
 
-## Under the following terms:
+❌ Commercial use without permission
+❌ Claiming authorship of SA-TM concepts
+❌ Creating derivative works without permission
+❌ Using SA-TM in patents without permission
+❌ Incorporating into proprietary software
 
-- **Attribution** — You must give appropriate credit to **Rafig Huseynzade**, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+Patent Protection:
+The author reserves all patent rights related to:
 
-- **NonCommercial** — You may **not** use the material for commercial purposes.
+Structurally-Aware Turing Machine architecture
+Introspection-based barrier circumvention methods
+Related computational models and algorithms
 
-- **NoDerivatives** — If you remix, transform, or build upon the material, you **may not** distribute the modified material.
-
----
-
-## Academic Use Exception:
-
-Academic researchers may **cite**, **reference**, and **build upon** this work for **non-commercial research purposes**, provided:
-
-- Full attribution is given to **Rafig Huseynzade** as the original author  
-- The original **SA-TM framework** is properly credited  
-- Any derivative work clearly states it builds upon SA-TM  
-- **No commercial use** without explicit written permission
-
----
-
-## Prohibited Actions:
-
-- ❌ Commercial use without permission  
-- ❌ Claiming authorship of SA-TM concepts  
-- ❌ Creating derivative works without permission  
-- ❌ Using SA-TM in patents without permission  
-- ❌ Incorporating into proprietary software
-
----
-
-## Patent Protection:
-
-The author reserves all **patent rights** related to:
-
-- Structurally-Aware Turing Machine architecture  
-- Introspection-based barrier circumvention methods  
-- Related computational models and algorithms
-
----
-
-## Contact
-
+Contact:
 For permissions beyond this license, contact: huseynzaderafig@gmail.com
 
----
-
-## ⚠️ Disclaimer
-
-This work is provided **"as is"** without warranty of any kind. The author shall not be liable for any damages arising from the use of this work.
+Full License Text: https://creativecommons.org/licenses/by-nc-nd/4.0/
+Disclaimer: This work is provided "as is" without warranty of any kind. The author shall not be liable for any damages arising from the use of this work.
