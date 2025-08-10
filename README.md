@@ -1,67 +1,30 @@
-# sa-tm-barrier-bypass
+# SA-TM
 
+**Structurally-Aware Turing Machines (SA-TM): Oracle Model with Θ(log n) Introspection**
 
+This repository contains the LaTeX source, bibliography, and supplementary material for a preprint that studies an **oracle** model of computation with bounded introspection and presents an **assumption-based oracle separation**.
 
-**Structurally-Aware Turing Machines: Transcending Complexity Barriers**
+---
 
+## What this project claims (and what it does not)
 
+**Claims (within the SA-TM oracle model):**
+- **Model.** Deterministic **oracle** Turing machines with bounded-radius **Θ(log n)** introspection over code/state.
+- **Main result.** Under standard complexity/crypto assumptions (**ETH**, **LWE**), we construct an oracle \(O\) such that  
+  `P^O_SA != NP^O_SA` in the SA-TM model.
+- **Barrier stance (model-dependent).** The proof strategy is designed to **avoid the templates** of the four classical barriers (relativization, natural proofs, algebrization, proof complexity) **within this oracle setting**, via non-black-box introspection and LWE-based pseudorandomness.
 
-This repository contains the full LaTeX source, bibliography, and supplementary material
+**Not claimed:**
+- No non-oracle lower bounds for the **standard TM** model.
+- No resolution of **P vs NP**.
+- No global defeat of the four barriers **outside** the SA-TM oracle framework.
 
-for the preprint demonstrating an oracle separation `P^O_SA != NP^O_SA` that bypasses
+---
 
-all four major barriers in complexity theory.
-
-
-
-## Build Instructions
-
-
+## Build (arXiv-safe; no shell-escape)
 
 ```bash
-
 pdflatex main.tex
-
-bibtex main
-
+bibtex main     # if bibliography is used
 pdflatex main.tex
-
 pdflatex main.tex
-
-```
-
-## Repository Structure
-
-main.tex — main LaTeX source
-
-refs.bib — bibliography database
-
-README.md — this file
-
-
-## Bibliography
-
-Includes classical and modern references on:
-
-* Oracle separations (BGS75)
-
-* Natural Proofs (RR97)
-
-* Algebraization (AW09)
-
-* Proof Complexity (Frege, Krajíček95)
-
-* Sum-Check & PCP (Arora–Barak 2009)
-
-* LWE & Post-Quantum Cryptography
-
-* Dilithium digital signatures
-
-
-
-## License & Citation
-
-Please cite as:
-
-> R. Huseynzade, “Structurally-Aware Turing Machines: Transcending Complexity Barriers,” 2025.
-
